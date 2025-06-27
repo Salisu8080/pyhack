@@ -74,6 +74,6 @@ PyHack uses intelligent evaluation to assess your code:
 <!-- Badges -->
 <div align="center">
   
-[Website](https://saypeace/pyhack)
+[Website](https://saypeace.ng/pyhack)
 
 </div>
