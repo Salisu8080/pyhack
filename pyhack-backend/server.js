@@ -29,6 +29,9 @@ app.get('/health', (req, res) => {
 // API routes
 const authRoutes = require('./src/routes/auth');
 const userRoutes = require('./src/routes/users');
+const challengeRoutes = require('./src/routes/challenges');
+const leaderboardRoutes = require('./src/routes/leaderboard');
+const achievementRoutes = require('./src/routes/achievements');
 
 app.get('/api', (req, res) => {
   res.json({
@@ -48,6 +51,9 @@ app.get('/api', (req, res) => {
 // Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/challenges', challengeRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
+app.use('/api/achievements', achievementRoutes);
 
 // 404 handler
 app.use((req, res) => {
