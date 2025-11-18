@@ -1,0 +1,145 @@
+// Prisma schema for PyHack
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String         @id @default(uuid())
+  email             String         @unique
+  username          String         @unique
+  password          String
+  firstName         String?
+  lastName          String?
+  avatar            String?
+  role              UserRole       @default(USER)
+  isActive          Boolean        @default(true)
+  emailVerified     Boolean        @default(false)
+  verificationToken String?
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+  lastLogin         DateTime?
+  totalPoints       Int            @default(0)
+  currentStreak     Int            @default(0)
+  longestStreak     Int            @default(0)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  progress          UserProgress[]
+  sessions          Session[]
+  achievements      UserAchievement[]
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
+model Challenge {
+  id            String         @id @default(uuid())
+  levelNumber   Int            @unique
+  title         String
+  description   String         @db.Text
+  task          String         @db.Text
+  starterCode   String         @db.Text
+  expectedOutput String        @db.Text
+  hint          String?        @db.Text
+  solution      String         @db.Text
+  testType      String         @default("exact")
+  difficulty    String         @default("beginner")
+  points        Int            @default(10)
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  progress      UserProgress[]
+}
+
+model UserProgress {
+  id            String    @id @default(uuid())
+  userId        String
+  challengeId   String
+  status        String    @default("not_started")
+  attempts      Int       @default(0)
+  lastCode      String?   @db.Text
+  completedAt   DateTime?
+  timeSpent     Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge     Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, challengeId])
+  @@index([userId])
+  @@index([challengeId])
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  userAgent String?
+  ipAddress String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model Achievement {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  icon        String
+  points      Int
+  condition   String   @db.Text
+  createdAt   DateTime @default(now())
+
+  userAchievements UserAchievement[]
+}
+
+model UserAchievement {
+  id            String      @id @default(uuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime    @default(now())
+
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String
+  entity    String
+  entityId  String?
+  details   Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([entity])
+  @@index([createdAt])
+}
+
+model SystemSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String   @db.Text
+  category  String
+  updatedAt DateTime @updatedAt
+}
