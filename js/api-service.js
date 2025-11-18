@@ -5,8 +5,38 @@
 
 class APIService {
   constructor() {
-    this.baseURL = 'http://localhost:5000/api';
+    // Auto-detect environment and use appropriate API URL
+    this.baseURL = this.getAPIUrl();
     this.token = localStorage.getItem('pyhack-token');
+  }
+
+  /**
+   * Get API URL based on environment
+   * Priority: window.PYHACK_API_URL > environment detection > localhost
+   */
+  getAPIUrl() {
+    // Allow manual override via global variable (set in index.html or config)
+    if (window.PYHACK_API_URL) {
+      return window.PYHACK_API_URL;
+    }
+
+    // Detect environment
+    const hostname = window.location.hostname;
+
+    // Production on Vercel
+    if (hostname.includes('vercel.app')) {
+      // TODO: Replace with your deployed backend URL
+      // For now, return a placeholder - backend needs to be deployed
+      return 'https://your-backend-url.herokuapp.com/api';
+    }
+
+    // Production on custom domain
+    if (hostname === 'pyhack.com' || hostname === 'www.pyhack.com') {
+      return 'https://api.pyhack.com/api';
+    }
+
+    // Development/localhost
+    return 'http://localhost:5000/api';
   }
 
   // ==================== Helper Methods ====================

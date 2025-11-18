@@ -12,6 +12,9 @@ class AuthUI {
   // ==================== Initialization ====================
 
   async init() {
+    // Check backend connectivity
+    await this.checkBackendConnection();
+
     // Check if user is already authenticated
     if (this.api.isAuthenticated()) {
       try {
@@ -19,7 +22,14 @@ class AuthUI {
         this.updateAuthUI();
       } catch (error) {
         console.error('Failed to load user:', error);
-        this.api.setToken(null);
+        // If backend is unreachable, show warning but don't clear token
+        if (error.message && error.message.includes('Failed to fetch')) {
+          console.warn('Backend unavailable - working in offline mode');
+          this.showBackendOfflineWarning();
+        } else {
+          // Invalid token or other error - clear it
+          this.api.setToken(null);
+        }
         this.updateAuthUI();
       }
     } else {
@@ -28,6 +38,52 @@ class AuthUI {
 
     // Set up event listeners
     this.setupEventListeners();
+  }
+
+  async checkBackendConnection() {
+    try {
+      // Try to fetch challenges (public endpoint)
+      const response = await fetch(`${this.api.baseURL.replace('/api', '')}/health`, {
+        method: 'GET',
+        timeout: 5000,
+      });
+
+      if (!response.ok) {
+        throw new Error('Backend health check failed');
+      }
+
+      console.log('✅ Backend connected:', this.api.baseURL);
+    } catch (error) {
+      console.warn('⚠️ Backend not available:', this.api.baseURL);
+      console.warn('App will work in guest mode (local storage only)');
+
+      // Show a subtle notification
+      if (window.PYHACK_CONFIG && window.PYHACK_CONFIG.SHOW_CONNECTION_STATUS) {
+        this.showBackendOfflineWarning();
+      }
+    }
+  }
+
+  showBackendOfflineWarning() {
+    const warningHTML = `
+      <div class="alert alert-warning alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+           role="alert" style="z-index: 9999; max-width: 500px;">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Backend Offline:</strong> Working in guest mode. Your progress will be saved locally.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('afterbegin', warningHTML);
+
+    // Auto-dismiss after 10 seconds
+    setTimeout(() => {
+      const alert = document.querySelector('.alert-warning');
+      if (alert) {
+        const bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close();
+      }
+    }, 10000);
   }
 
   setupEventListeners() {
