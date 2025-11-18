@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - PyHack</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #2563eb;
+        --secondary-color: #3b82f6;
+        --success-color: #059669;
+        --warning-color: #d97706;
+        --danger-color: #dc2626;
+        --sidebar-width: 250px;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8fafc;
+      }
+
+      /* Sidebar Styles */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: var(--sidebar-width);
+        background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+        color: white;
+        overflow-y: auto;
+        z-index: 1000;
+        transition: transform 0.3s ease;
+      }
+
+      .sidebar-header {
+        padding: 1.5rem 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .sidebar-nav {
+        padding: 1rem 0;
+      }
+
+      .nav-item {
+        margin: 0.25rem 1rem;
+      }
+
+      .nav-link {
+        color: rgba(255, 255, 255, 0.7);
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        background-color: rgba(59, 130, 246, 0.2);
+        color: white;
+      }
+
+      .nav-link i {
+        margin-right: 0.75rem;
+        width: 20px;
+      }
+
+      /* Main Content */
+      .main-content {
+        margin-left: var(--sidebar-width);
+        min-height: 100vh;
+      }
+
+      .top-bar {
+        background: white;
+        padding: 1rem 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .content-area {
+        padding: 2rem;
+      }
+
+      /* Cards */
+      .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid var(--primary-color);
+      }
+
+      .stat-card.success {
+        border-left-color: var(--success-color);
+      }
+
+      .stat-card.warning {
+        border-left-color: var(--warning-color);
+      }
+
+      .stat-card.danger {
+        border-left-color: var(--danger-color);
+      }
+
+      .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1e293b;
+      }
+
+      .stat-label {
+        color: #64748b;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      /* Tables */
+      .table-container {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .table {
+        margin-bottom: 0;
+      }
+
+      .table thead th {
+        border-bottom: 2px solid #e5e7eb;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+      }
+
+      .badge-role {
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      /* Buttons */
+      .btn-custom {
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        transition: all 0.3s;
+      }
+
+      .btn-primary-custom {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border: none;
+        color: white;
+      }
+
+      .btn-primary-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      }
+
+      /* Section Headers */
+      .section-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e5e7eb;
+      }
+
+      .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+      }
+
+      .section-subtitle {
+        color: #64748b;
+        margin: 0;
+      }
+
+      /* Loading States */
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+
+      /* Form Styles */
+      .form-label {
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 0.5rem;
+      }
+
+      .form-control:focus,
+      .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+
+        .sidebar.show {
+          transform: translateX(0);
+        }
+
+        .main-content {
+          margin-left: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay d-none">
+      <div class="text-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3 fw-bold">Loading...</p>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h4 class="mb-0">
+          <i class="fas fa-code me-2"></i>PyHack Admin
+        </h4>
+        <small class="text-white-50">Admin Dashboard</small>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-item">
+          <a href="#" class="nav-link active" data-section="dashboard">
+            <i class="fas fa-tachometer-alt"></i>
+            Dashboard
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="#" class="nav-link" data-section="users">
+            <i class="fas fa-users"></i>
+            Users
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="#" class="nav-link" data-section="challenges">
+            <i class="fas fa-code"></i>
+            Challenges
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="#" class="nav-link" data-section="analytics">
+            <i class="fas fa-chart-line"></i>
+            Analytics
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="#" class="nav-link" data-section="settings">
+            <i class="fas fa-cog"></i>
+            Settings
+          </a>
+        </div>
+        <hr class="border-secondary my-3" />
+        <div class="nav-item">
+          <a href="index.html" class="nav-link">
+            <i class="fas fa-home"></i>
+            Back to App
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="#" class="nav-link" id="admin-logout">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+          </a>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <button class="btn btn-outline-secondary d-md-none me-3" id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+            <span class="fw-bold" id="page-title">Dashboard</span>
+          </div>
+          <div>
+            <span class="text-muted me-2">Welcome,</span>
+            <span class="fw-bold" id="admin-username">Admin</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Area -->
+      <div class="content-area">
+        <!-- Dashboard Section -->
+        <div id="section-dashboard" class="content-section">
+          <div class="section-header">
+            <h2 class="section-title">Dashboard Overview</h2>
+            <p class="section-subtitle">Quick overview of platform statistics</p>
+          </div>
+
+          <!-- Stats Cards -->
+          <div class="row g-4 mb-4">
+            <div class="col-md-3">
+              <div class="stat-card">
+                <div class="stat-label">Total Users</div>
+                <div class="stat-value" id="stat-total-users">0</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card success">
+                <div class="stat-label">Active Users</div>
+                <div class="stat-value" id="stat-active-users">0</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card warning">
+                <div class="stat-label">Total Challenges</div>
+                <div class="stat-value" id="stat-total-challenges">0</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card danger">
+                <div class="stat-label">Submissions Today</div>
+                <div class="stat-value" id="stat-submissions">0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="row">
+            <div class="col-12">
+              <div class="table-container">
+                <h5 class="mb-3">Recent Activity</h5>
+                <div id="recent-activity">
+                  <p class="text-muted">Loading recent activity...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Users Section -->
+        <div id="section-users" class="content-section d-none">
+          <div class="section-header">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h2 class="section-title mb-2">User Management</h2>
+                <p class="section-subtitle mb-0">Manage user accounts and permissions</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filters -->
+          <div class="mb-4">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <input type="text" class="form-control" id="user-search" placeholder="Search users..." />
+              </div>
+              <div class="col-md-3">
+                <select class="form-select" id="user-role-filter">
+                  <option value="">All Roles</option>
+                  <option value="USER">User</option>
+                  <option value="ADMIN">Admin</option>
+                  <option value="SUPER_ADMIN">Super Admin</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <select class="form-select" id="user-status-filter">
+                  <option value="">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <button class="btn btn-primary-custom w-100" onclick="loadUsers()">
+                  <i class="fas fa-search me-2"></i>Search
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Users Table -->
+          <div class="table-container">
+            <div id="users-table-container">
+              <p class="text-muted">Loading users...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Challenges Section -->
+        <div id="section-challenges" class="content-section d-none">
+          <div class="section-header">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h2 class="section-title mb-2">Challenge Management</h2>
+                <p class="section-subtitle mb-0">Create and manage coding challenges</p>
+              </div>
+              <button class="btn btn-primary-custom" onclick="showCreateChallengeModal()">
+                <i class="fas fa-plus me-2"></i>Create Challenge
+              </button>
+            </div>
+          </div>
+
+          <!-- Challenges Table -->
+          <div class="table-container">
+            <div id="challenges-table-container">
+              <p class="text-muted">Loading challenges...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div id="section-analytics" class="content-section d-none">
+          <div class="section-header">
+            <h2 class="section-title">Analytics & Reports</h2>
+            <p class="section-subtitle">Platform usage and performance metrics</p>
+          </div>
+
+          <!-- Analytics Content -->
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="table-container">
+                <h5 class="mb-3">Completion Rates by Challenge</h5>
+                <div id="completion-rates-chart">
+                  <p class="text-muted">Loading analytics...</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="table-container">
+                <h5 class="mb-3">Top Performers</h5>
+                <div id="top-performers-list">
+                  <p class="text-muted">Loading data...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="section-settings" class="content-section d-none">
+          <div class="section-header">
+            <h2 class="section-title">System Settings</h2>
+            <p class="section-subtitle">Configure platform settings</p>
+          </div>
+
+          <!-- Settings Form -->
+          <div class="table-container">
+            <div id="settings-container">
+              <p class="text-muted">Loading settings...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit User</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form id="edit-user-form">
+              <input type="hidden" id="edit-user-id" />
+              <div class="mb-3">
+                <label for="edit-username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="edit-username" required />
+              </div>
+              <div class="mb-3">
+                <label for="edit-email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="edit-email" required />
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="edit-firstname" class="form-label">First Name</label>
+                  <input type="text" class="form-control" id="edit-firstname" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="edit-lastname" class="form-label">Last Name</label>
+                  <input type="text" class="form-control" id="edit-lastname" required />
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="edit-role" class="form-label">Role</label>
+                <select class="form-select" id="edit-role">
+                  <option value="USER">User</option>
+                  <option value="ADMIN">Admin</option>
+                  <option value="SUPER_ADMIN">Super Admin</option>
+                </select>
+              </div>
+              <div class="alert alert-danger d-none" id="edit-user-error"></div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary-custom" onclick="saveUserChanges()">
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Challenge Modal -->
+    <div class="modal fade" id="createChallengeModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Create New Challenge</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form id="create-challenge-form">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="create-level-number" class="form-label">Level Number</label>
+                  <input type="number" class="form-control" id="create-level-number" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="create-difficulty" class="form-label">Difficulty</label>
+                  <select class="form-select" id="create-difficulty">
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                  </select>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="create-title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="create-title" required />
+              </div>
+              <div class="mb-3">
+                <label for="create-description" class="form-label">Description</label>
+                <textarea class="form-control" id="create-description" rows="2" required></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="create-task" class="form-label">Task</label>
+                <textarea class="form-control" id="create-task" rows="2" required></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="create-starter-code" class="form-label">Starter Code</label>
+                <textarea class="form-control" id="create-starter-code" rows="3" required></textarea>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="create-expected-output" class="form-label">Expected Output</label>
+                  <input type="text" class="form-control" id="create-expected-output" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="create-points" class="form-label">Points</label>
+                  <input type="number" class="form-control" id="create-points" value="10" required />
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="create-hint" class="form-label">Hint</label>
+                <textarea class="form-control" id="create-hint" rows="2"></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="create-solution" class="form-label">Solution</label>
+                <textarea class="form-control" id="create-solution" rows="3" required></textarea>
+              </div>
+              <div class="alert alert-danger d-none" id="create-challenge-error"></div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary-custom" onclick="saveNewChallenge()">
+              Create Challenge
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="js/api-service.js"></script>
+    <script>
+      // Admin Dashboard JavaScript
+      let currentSection = 'dashboard';
+      let currentUser = null;
+
+      // Initialize
+      document.addEventListener('DOMContentLoaded', async () => {
+        // Check if user is authenticated and is admin
+        if (!api.isAuthenticated()) {
+          window.location.href = 'index.html';
+          return;
+        }
+
+        try {
+          const response = await api.getMe();
+          currentUser = response.user;
+
+          if (currentUser.role !== 'ADMIN' && currentUser.role !== 'SUPER_ADMIN') {
+            alert('Access denied. Admin privileges required.');
+            window.location.href = 'index.html';
+            return;
+          }
+
+          // Update admin username display
+          document.getElementById('admin-username').textContent = currentUser.username;
+
+          // Load dashboard
+          await loadDashboard();
+
+          // Setup navigation
+          setupNavigation();
+
+          // Setup sidebar toggle
+          document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('show');
+          });
+
+          // Setup logout
+          document.getElementById('admin-logout')?.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await api.logout();
+            window.location.href = 'index.html';
+          });
+        } catch (error) {
+          console.error('Initialization error:', error);
+          alert('Failed to load admin dashboard. Please try again.');
+          window.location.href = 'index.html';
+        }
+      });
+
+      // Navigation
+      function setupNavigation() {
+        document.querySelectorAll('[data-section]').forEach((link) => {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const section = link.dataset.section;
+            switchSection(section);
+          });
+        });
+      }
+
+      function switchSection(section) {
+        // Update active nav link
+        document.querySelectorAll('.nav-link').forEach((link) => {
+          link.classList.remove('active');
+        });
+        document.querySelector(`[data-section="${section}"]`)?.classList.add('active');
+
+        // Hide all sections
+        document.querySelectorAll('.content-section').forEach((sec) => {
+          sec.classList.add('d-none');
+        });
+
+        // Show selected section
+        document.getElementById(`section-${section}`)?.classList.remove('d-none');
+
+        // Update page title
+        const titles = {
+          dashboard: 'Dashboard',
+          users: 'User Management',
+          challenges: 'Challenge Management',
+          analytics: 'Analytics',
+          settings: 'System Settings',
+        };
+        document.getElementById('page-title').textContent = titles[section] || section;
+
+        // Load section data
+        currentSection = section;
+        switch (section) {
+          case 'dashboard':
+            loadDashboard();
+            break;
+          case 'users':
+            loadUsers();
+            break;
+          case 'challenges':
+            loadChallenges();
+            break;
+          case 'analytics':
+            loadAnalytics();
+            break;
+          case 'settings':
+            loadSettings();
+            break;
+        }
+      }
+
+      // Loading indicator
+      function showLoading() {
+        document.getElementById('loading-overlay').classList.remove('d-none');
+      }
+
+      function hideLoading() {
+        document.getElementById('loading-overlay').classList.add('d-none');
+      }
+
+      // Dashboard
+      async function loadDashboard() {
+        try {
+          const analytics = await api.adminGetAnalytics();
+
+          document.getElementById('stat-total-users').textContent = analytics.totalUsers || 0;
+          document.getElementById('stat-active-users').textContent = analytics.activeUsers || 0;
+          document.getElementById('stat-total-challenges').textContent = analytics.totalChallenges || 0;
+          document.getElementById('stat-submissions').textContent = analytics.totalSubmissions || 0;
+
+          // Show placeholder for recent activity
+          document.getElementById('recent-activity').innerHTML = `
+            <p class="text-muted">Recent activity tracking coming soon...</p>
+          `;
+        } catch (error) {
+          console.error('Failed to load dashboard:', error);
+        }
+      }
+
+      // Users Management
+      async function loadUsers() {
+        showLoading();
+        try {
+          const search = document.getElementById('user-search')?.value || '';
+          const role = document.getElementById('user-role-filter')?.value || '';
+          const isActive = document.getElementById('user-status-filter')?.value;
+
+          const params = {
+            search,
+            ...(role && { role }),
+            ...(isActive && { isActive: isActive === 'active' }),
+          };
+
+          const response = await api.adminGetUsers(params);
+          const users = response.users || [];
+
+          const container = document.getElementById('users-table-container');
+
+          if (users.length === 0) {
+            container.innerHTML = '<p class="text-muted">No users found.</p>';
+            return;
+          }
+
+          const roleColors = {
+            USER: 'secondary',
+            ADMIN: 'primary',
+            SUPER_ADMIN: 'danger',
+          };
+
+          container.innerHTML = `
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Points</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${users
+                  .map(
+                    (user) => `
+                  <tr>
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                    <td>${user.firstName} ${user.lastName}</td>
+                    <td><span class="badge bg-${roleColors[user.role]}">${user.role}</span></td>
+                    <td>
+                      <span class="badge bg-${user.isActive ? 'success' : 'secondary'}">
+                        ${user.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td>${user.points || 0}</td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-primary" onclick="editUser('${user.id}')">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-warning" onclick="toggleUserStatus('${user.id}')">
+                        <i class="fas fa-toggle-${user.isActive ? 'on' : 'off'}"></i>
+                      </button>
+                    </td>
+                  </tr>
+                `
+                  )
+                  .join('')}
+              </tbody>
+            </table>
+          `;
+        } catch (error) {
+          console.error('Failed to load users:', error);
+          document.getElementById('users-table-container').innerHTML =
+            '<p class="text-danger">Failed to load users.</p>';
+        } finally {
+          hideLoading();
+        }
+      }
+
+      async function editUser(userId) {
+        try {
+          const user = await api.adminGetUser(userId);
+
+          document.getElementById('edit-user-id').value = user.id;
+          document.getElementById('edit-username').value = user.username;
+          document.getElementById('edit-email').value = user.email;
+          document.getElementById('edit-firstname').value = user.firstName;
+          document.getElementById('edit-lastname').value = user.lastName;
+          document.getElementById('edit-role').value = user.role;
+
+          new bootstrap.Modal(document.getElementById('editUserModal')).show();
+        } catch (error) {
+          console.error('Failed to load user:', error);
+          alert('Failed to load user data.');
+        }
+      }
+
+      async function saveUserChanges() {
+        const userId = document.getElementById('edit-user-id').value;
+        const userData = {
+          username: document.getElementById('edit-username').value,
+          email: document.getElementById('edit-email').value,
+          firstName: document.getElementById('edit-firstname').value,
+          lastName: document.getElementById('edit-lastname').value,
+          role: document.getElementById('edit-role').value,
+        };
+
+        try {
+          await api.adminUpdateUser(userId, userData);
+          bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide();
+          await loadUsers();
+          alert('User updated successfully!');
+        } catch (error) {
+          console.error('Failed to update user:', error);
+          document.getElementById('edit-user-error').textContent = error.message;
+          document.getElementById('edit-user-error').classList.remove('d-none');
+        }
+      }
+
+      async function toggleUserStatus(userId) {
+        if (!confirm('Are you sure you want to toggle this user\'s status?')) return;
+
+        try {
+          await api.adminToggleUserStatus(userId);
+          await loadUsers();
+        } catch (error) {
+          console.error('Failed to toggle user status:', error);
+          alert('Failed to toggle user status.');
+        }
+      }
+
+      // Challenges Management
+      async function loadChallenges() {
+        showLoading();
+        try {
+          const response = await api.adminGetChallenges();
+          const challenges = response.challenges || [];
+
+          const container = document.getElementById('challenges-table-container');
+
+          if (challenges.length === 0) {
+            container.innerHTML = '<p class="text-muted">No challenges found.</p>';
+            return;
+          }
+
+          container.innerHTML = `
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Level</th>
+                  <th>Title</th>
+                  <th>Difficulty</th>
+                  <th>Points</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${challenges
+                  .map(
+                    (challenge) => `
+                  <tr>
+                    <td>${challenge.levelNumber}</td>
+                    <td>${challenge.title}</td>
+                    <td><span class="badge bg-info">${challenge.difficulty}</span></td>
+                    <td>${challenge.points}</td>
+                    <td>
+                      <span class="badge bg-${challenge.isActive ? 'success' : 'secondary'}">
+                        ${challenge.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-warning" onclick="toggleChallengeStatus(${challenge.id})">
+                        <i class="fas fa-toggle-${challenge.isActive ? 'on' : 'off'}"></i>
+                      </button>
+                    </td>
+                  </tr>
+                `
+                  )
+                  .join('')}
+              </tbody>
+            </table>
+          `;
+        } catch (error) {
+          console.error('Failed to load challenges:', error);
+          document.getElementById('challenges-table-container').innerHTML =
+            '<p class="text-danger">Failed to load challenges.</p>';
+        } finally {
+          hideLoading();
+        }
+      }
+
+      function showCreateChallengeModal() {
+        document.getElementById('create-challenge-form').reset();
+        new bootstrap.Modal(document.getElementById('createChallengeModal')).show();
+      }
+
+      async function saveNewChallenge() {
+        const challengeData = {
+          levelNumber: parseInt(document.getElementById('create-level-number').value),
+          title: document.getElementById('create-title').value,
+          description: document.getElementById('create-description').value,
+          task: document.getElementById('create-task').value,
+          starterCode: document.getElementById('create-starter-code').value,
+          expectedOutput: document.getElementById('create-expected-output').value,
+          hint: document.getElementById('create-hint').value,
+          solution: document.getElementById('create-solution').value,
+          difficulty: document.getElementById('create-difficulty').value,
+          points: parseInt(document.getElementById('create-points').value),
+        };
+
+        try {
+          await api.adminCreateChallenge(challengeData);
+          bootstrap.Modal.getInstance(document.getElementById('createChallengeModal')).hide();
+          await loadChallenges();
+          alert('Challenge created successfully!');
+        } catch (error) {
+          console.error('Failed to create challenge:', error);
+          document.getElementById('create-challenge-error').textContent = error.message;
+          document.getElementById('create-challenge-error').classList.remove('d-none');
+        }
+      }
+
+      async function toggleChallengeStatus(challengeId) {
+        // Implementation would use PATCH /admin/challenges/:id/status
+        alert('Toggle challenge status - Implementation pending');
+      }
+
+      // Analytics
+      async function loadAnalytics() {
+        showLoading();
+        try {
+          const [completionRates, topUsers] = await Promise.all([
+            api.adminGetAnalytics(),
+            fetch(`${api.baseURL}/admin/analytics/top-users`, {
+              headers: api.getHeaders(),
+            }).then((r) => r.json()),
+          ]);
+
+          // Show completion rates placeholder
+          document.getElementById('completion-rates-chart').innerHTML = `
+            <p class="text-muted">Completion rate charts coming soon...</p>
+          `;
+
+          // Show top performers
+          if (topUsers && topUsers.users) {
+            document.getElementById('top-performers-list').innerHTML = `
+              <div class="list-group">
+                ${topUsers.users
+                  .map(
+                    (user, idx) => `
+                  <div class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                      <div>
+                        <strong>#${idx + 1}</strong>
+                        ${user.username}
+                      </div>
+                      <span class="badge bg-primary">${user.points} pts</span>
+                    </div>
+                  </div>
+                `
+                  )
+                  .join('')}
+              </div>
+            `;
+          }
+        } catch (error) {
+          console.error('Failed to load analytics:', error);
+        } finally {
+          hideLoading();
+        }
+      }
+
+      // Settings
+      async function loadSettings() {
+        showLoading();
+        try {
+          const response = await api.adminGetSettings();
+          const settings = response.settings || [];
+
+          const container = document.getElementById('settings-container');
+
+          if (settings.length === 0) {
+            container.innerHTML = '<p class="text-muted">No settings found.</p>';
+            return;
+          }
+
+          const grouped = settings.reduce((acc, setting) => {
+            if (!acc[setting.category]) acc[setting.category] = [];
+            acc[setting.category].push(setting);
+            return acc;
+          }, {});
+
+          container.innerHTML = Object.keys(grouped)
+            .map(
+              (category) => `
+            <div class="mb-4">
+              <h6 class="text-uppercase text-muted mb-3">${category}</h6>
+              ${grouped[category]
+                .map(
+                  (setting) => `
+                <div class="mb-3">
+                  <label class="form-label">${setting.key}</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    value="${setting.value}"
+                    onchange="updateSetting('${setting.key}', this.value)"
+                  />
+                </div>
+              `
+                )
+                .join('')}
+            </div>
+          `
+            )
+            .join('');
+        } catch (error) {
+          console.error('Failed to load settings:', error);
+          document.getElementById('settings-container').innerHTML =
+            '<p class="text-danger">Failed to load settings.</p>';
+        } finally {
+          hideLoading();
+        }
+      }
+
+      async function updateSetting(key, value) {
+        try {
+          await api.adminUpdateSetting(key, value);
+          alert('Setting updated successfully!');
+        } catch (error) {
+          console.error('Failed to update setting:', error);
+          alert('Failed to update setting.');
+        }
+      }
+
+      // Make functions global
+      window.loadUsers = loadUsers;
+      window.editUser = editUser;
+      window.saveUserChanges = saveUserChanges;
+      window.toggleUserStatus = toggleUserStatus;
+      window.loadChallenges = loadChallenges;
+      window.showCreateChallengeModal = showCreateChallengeModal;
+      window.saveNewChallenge = saveNewChallenge;
+      window.toggleChallengeStatus = toggleChallengeStatus;
+    </script>
+  </body>
+</html>
