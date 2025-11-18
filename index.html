@@ -240,6 +240,65 @@
                 <span id="streak-count">0</span>
                 <span class="ms-1">streak</span>
               </div>
+
+              <!-- Authentication Buttons (shown when not logged in) -->
+              <div id="auth-buttons" class="me-3">
+                <button
+                  class="btn btn-outline-primary btn-sm me-2"
+                  onclick="authUI.showLoginModal()"
+                >
+                  <i class="fas fa-sign-in-alt me-1"></i>Login
+                </button>
+                <button
+                  class="btn btn-primary-custom btn-sm"
+                  onclick="authUI.showRegisterModal()"
+                >
+                  <i class="fas fa-user-plus me-1"></i>Sign Up
+                </button>
+              </div>
+
+              <!-- User Menu (shown when logged in) -->
+              <div id="user-menu" class="dropdown me-3 d-none">
+                <button
+                  class="btn btn-outline-primary btn-sm dropdown-toggle"
+                  type="button"
+                  id="userMenuButton"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <i class="fas fa-user-circle me-1"></i>
+                  <span id="user-display-name">User</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
+                  <li>
+                    <a class="dropdown-item" href="#" onclick="showDashboard()">
+                      <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#" onclick="showLeaderboard()">
+                      <i class="fas fa-trophy me-2"></i>Leaderboard
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#" onclick="showAchievements()">
+                      <i class="fas fa-medal me-2"></i>Achievements
+                    </a>
+                  </li>
+                  <li id="admin-link" class="d-none">
+                    <a class="dropdown-item" href="admin.html">
+                      <i class="fas fa-cog me-2"></i>Admin Panel
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider" /></li>
+                  <li>
+                    <a class="dropdown-item" href="#" id="logout-btn">
+                      <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
               <button
                 class="btn btn-primary-custom btn-custom"
                 onclick="toggleLevelSelector()"
@@ -270,6 +329,144 @@
       </div>
     </header>
 
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="loginModalLabel">
+              <i class="fas fa-sign-in-alt me-2"></i>Login to PyHack
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="login-form">
+              <div class="mb-3">
+                <label for="login-identifier" class="form-label">Email or Username</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="login-identifier"
+                  required
+                  placeholder="Enter your email or username"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="login-password" class="form-label">Password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="login-password"
+                  required
+                  placeholder="Enter your password"
+                />
+              </div>
+              <div class="alert alert-danger d-none" id="login-error"></div>
+              <button type="submit" class="btn btn-primary-custom w-100" id="login-submit-btn">
+                <i class="fas fa-sign-in-alt me-2"></i>Login
+              </button>
+            </form>
+            <div class="text-center mt-3">
+              <p class="text-muted mb-0">
+                Don't have an account?
+                <a href="#" id="show-register" class="text-primary">Sign up here</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="registerModalLabel">
+              <i class="fas fa-user-plus me-2"></i>Create Account
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="register-form">
+              <div class="mb-3">
+                <label for="register-email" class="form-label">Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="register-email"
+                  required
+                  placeholder="your.email@example.com"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="register-username" class="form-label">Username</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="register-username"
+                  required
+                  placeholder="Choose a username"
+                />
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="register-firstname" class="form-label">First Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="register-firstname"
+                    required
+                    placeholder="John"
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="register-lastname" class="form-label">Last Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="register-lastname"
+                    required
+                    placeholder="Doe"
+                  />
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="register-password" class="form-label">Password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="register-password"
+                  required
+                  placeholder="At least 6 characters"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="register-confirm-password" class="form-label">Confirm Password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="register-confirm-password"
+                  required
+                  placeholder="Re-enter your password"
+                />
+              </div>
+              <div class="alert alert-danger d-none" id="register-error"></div>
+              <button type="submit" class="btn btn-primary-custom w-100" id="register-submit-btn">
+                <i class="fas fa-user-plus me-2"></i>Create Account
+              </button>
+            </form>
+            <div class="text-center mt-3">
+              <p class="text-muted mb-0">
+                Already have an account?
+                <a href="#" id="show-login" class="text-primary">Login here</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Level Selector Modal -->
     <div class="modal fade" id="levelSelectorModal" tabindex="-1">
       <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -287,6 +484,140 @@
           <div class="modal-body">
             <div class="row g-3" id="level-grid">
               <!-- Level cards will be generated here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Modal -->
+    <div class="modal fade" id="dashboardModal" tabindex="-1" aria-labelledby="dashboardModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="dashboardModalLabel">
+              <i class="fas fa-tachometer-alt me-2"></i>My Dashboard
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-3 mb-4">
+              <div class="col-md-4">
+                <div class="card bg-primary bg-opacity-10 border-0">
+                  <div class="card-body text-center">
+                    <i class="fas fa-check-circle text-primary fs-1 mb-2"></i>
+                    <h3 class="mb-0" id="dash-completed">0</h3>
+                    <p class="text-muted mb-0">Completed</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card bg-warning bg-opacity-10 border-0">
+                  <div class="card-body text-center">
+                    <i class="fas fa-star text-warning fs-1 mb-2"></i>
+                    <h3 class="mb-0" id="dash-points">0</h3>
+                    <p class="text-muted mb-0">Total Points</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card bg-danger bg-opacity-10 border-0">
+                  <div class="card-body text-center">
+                    <i class="fas fa-fire text-danger fs-1 mb-2"></i>
+                    <h3 class="mb-0" id="dash-streak">0</h3>
+                    <p class="text-muted mb-0">Day Streak</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <h6 class="fw-bold mb-3">Recent Progress</h6>
+            <div id="dash-progress-list">
+              <p class="text-muted">No progress yet. Start solving challenges!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div class="modal fade" id="leaderboardModal" tabindex="-1" aria-labelledby="leaderboardModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="leaderboardModalLabel">
+              <i class="fas fa-trophy me-2"></i>Leaderboard
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <ul class="nav nav-tabs mb-3" id="leaderboard-tabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link active"
+                  id="global-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#global"
+                  type="button"
+                  role="tab"
+                  onclick="loadLeaderboard('global')"
+                >
+                  Global
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  id="weekly-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#weekly"
+                  type="button"
+                  role="tab"
+                  onclick="loadLeaderboard('weekly')"
+                >
+                  This Week
+                </button>
+              </li>
+            </ul>
+            <div class="tab-content" id="leaderboard-content">
+              <div class="tab-pane fade show active" id="global" role="tabpanel">
+                <div id="global-leaderboard-list">
+                  <div class="text-center py-3">
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    Loading...
+                  </div>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="weekly" role="tabpanel">
+                <div id="weekly-leaderboard-list">
+                  <div class="text-center py-3">
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    Loading...
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Achievements Modal -->
+    <div class="modal fade" id="achievementsModal" tabindex="-1" aria-labelledby="achievementsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="achievementsModalLabel">
+              <i class="fas fa-medal me-2"></i>Achievements
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="achievements-list">
+              <div class="text-center py-3">
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Loading achievements...
+              </div>
             </div>
           </div>
         </div>
@@ -428,6 +759,9 @@
       async
       src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"
     ></script>
+    <!-- API Service and Authentication -->
+    <script src="js/api-service.js"></script>
+    <script src="js/auth-ui.js"></script>
     <script>
       // Translations and level data
       const TRANSLATIONS = {
@@ -719,9 +1053,30 @@
       document.addEventListener('DOMContentLoaded', async function () {
         await initializePyodide();
         loadState();
-        generateLevelGrid();
-        loadLevel(currentLevel);
-        updateUI();
+
+        // Wait for authUI to initialize, then load backend data if authenticated
+        const checkAuth = setInterval(async () => {
+          if (authUI && authUI.isAuthenticated()) {
+            clearInterval(checkAuth);
+            await loadChallengesFromBackend();
+          } else if (authUI && !authUI.isAuthenticated()) {
+            clearInterval(checkAuth);
+            // Use hardcoded challenges
+            generateLevelGrid();
+            loadLevel(currentLevel);
+            updateUI();
+          }
+        }, 100);
+
+        // Timeout after 2 seconds to proceed with hardcoded data
+        setTimeout(() => {
+          clearInterval(checkAuth);
+          if (!authUI || !authUI.isAuthenticated()) {
+            generateLevelGrid();
+            loadLevel(currentLevel);
+            updateUI();
+          }
+        }, 2000);
       });
 
       // State management
@@ -1194,12 +1549,51 @@
           if (isCorrect) {
             completedLevels.add(currentLevel);
             streak++;
+
+            // Submit to backend if authenticated
+            if (api && api.isAuthenticated()) {
+              try {
+                const backendResponse = await submitCodeToBackend(
+                  currentLevel,
+                  userCode,
+                  output,
+                  true
+                );
+
+                if (backendResponse && backendResponse.newAchievements && backendResponse.newAchievements.length > 0) {
+                  // Show achievement notification
+                  backendResponse.newAchievements.forEach((achievement) => {
+                    setTimeout(() => {
+                      authUI.showToast(
+                        '🎉 Achievement Unlocked!',
+                        `${achievement.icon} ${achievement.name}: ${achievement.description}`,
+                        'success'
+                      );
+                    }, 500);
+                  });
+                }
+              } catch (error) {
+                console.error('Backend submission error:', error);
+                // Continue even if backend submission fails
+              }
+            }
+
             showFeedback('success', '🎉 Excellent! You completed this level!', {
               output: output,
               explanation: `Your solution correctly outputs: "${output}"`,
             });
           } else {
             streak = 0;
+
+            // Submit failed attempt to backend if authenticated
+            if (api && api.isAuthenticated()) {
+              try {
+                await submitCodeToBackend(currentLevel, userCode, output, false);
+              } catch (error) {
+                console.error('Backend submission error:', error);
+              }
+            }
+
             showFeedback(
               'error',
               "Not quite right. Let's review your solution:",
@@ -1232,6 +1626,288 @@
         hideFeedback();
         hideHint();
       }
+
+      // ==================== Backend Integration Functions ====================
+
+      /**
+       * Load challenges from backend
+       */
+      async function loadChallengesFromBackend() {
+        if (!api || !api.isAuthenticated()) {
+          return; // Use hardcoded challenges if not authenticated
+        }
+
+        try {
+          const response = await api.getChallenges();
+
+          if (response.challenges && response.challenges.length > 0) {
+            // Update levels array with backend data
+            levels.length = 0; // Clear existing
+
+            response.challenges.forEach((challenge) => {
+              levels.push({
+                id: challenge.levelNumber,
+                title: challenge.title,
+                description: challenge.description,
+                task: challenge.task,
+                starterCode: challenge.starterCode,
+                expectedOutput: challenge.expectedOutput,
+                hint: challenge.hint,
+                solution: challenge.solution,
+                testType: challenge.testType,
+                expectedPattern: challenge.expectedPattern ? new RegExp(challenge.expectedPattern) : null,
+              });
+            });
+
+            // Load user progress from backend
+            await loadProgressFromBackend();
+
+            // Refresh UI
+            generateLevelGrid();
+            loadLevel(currentLevel);
+            updateUI();
+          }
+        } catch (error) {
+          console.error('Failed to load challenges from backend:', error);
+          // Continue with hardcoded challenges
+        }
+      }
+
+      /**
+       * Load user progress from backend
+       */
+      async function loadProgressFromBackend() {
+        if (!api || !api.isAuthenticated()) {
+          return;
+        }
+
+        try {
+          const response = await api.getProgress();
+
+          if (response.progress) {
+            completedLevels.clear();
+
+            response.progress.forEach((progress) => {
+              if (progress.isCompleted) {
+                completedLevels.add(progress.challenge.levelNumber);
+              }
+            });
+          }
+
+          // Load user stats
+          const stats = await api.getStats();
+          if (stats) {
+            streak = stats.currentStreak || 0;
+          }
+        } catch (error) {
+          console.error('Failed to load progress from backend:', error);
+        }
+      }
+
+      /**
+       * Submit code to backend for validation (when authenticated)
+       */
+      async function submitCodeToBackend(challengeId, code, output, isCorrect) {
+        if (!api || !api.isAuthenticated()) {
+          return null;
+        }
+
+        try {
+          const response = await api.submitChallenge(challengeId, {
+            code,
+            output,
+            isCorrect,
+          });
+
+          return response;
+        } catch (error) {
+          console.error('Failed to submit to backend:', error);
+          return null;
+        }
+      }
+
+      /**
+       * Show user dashboard
+       */
+      async function showDashboard() {
+        if (!api || !api.isAuthenticated()) {
+          authUI.showLoginModal();
+          return;
+        }
+
+        try {
+          const stats = await api.getStats();
+          const progress = await api.getProgress();
+
+          // Update dashboard stats
+          document.getElementById('dash-completed').textContent = stats.challengesCompleted || 0;
+          document.getElementById('dash-points').textContent = stats.totalPoints || 0;
+          document.getElementById('dash-streak').textContent = stats.currentStreak || 0;
+
+          // Update progress list
+          const progressList = document.getElementById('dash-progress-list');
+          if (progress.progress && progress.progress.length > 0) {
+            progressList.innerHTML = progress.progress
+              .slice(0, 10)
+              .map(
+                (p) => `
+                  <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                    <div>
+                      <strong>Level ${p.challenge.levelNumber}:</strong> ${p.challenge.title}
+                      ${p.isCompleted ? '<i class="fas fa-check-circle text-success ms-2"></i>' : ''}
+                    </div>
+                    <small class="text-muted">${p.attempts} attempts</small>
+                  </div>
+                `
+              )
+              .join('');
+          } else {
+            progressList.innerHTML = '<p class="text-muted">No progress yet. Start solving challenges!</p>';
+          }
+
+          // Show modal
+          new bootstrap.Modal(document.getElementById('dashboardModal')).show();
+        } catch (error) {
+          console.error('Failed to load dashboard:', error);
+          authUI.showToast('Error', 'Failed to load dashboard data', 'danger');
+        }
+      }
+
+      /**
+       * Show leaderboard
+       */
+      async function showLeaderboard() {
+        new bootstrap.Modal(document.getElementById('leaderboardModal')).show();
+        await loadLeaderboard('global');
+      }
+
+      /**
+       * Load leaderboard data
+       */
+      async function loadLeaderboard(type = 'global') {
+        const listId = type === 'global' ? 'global-leaderboard-list' : 'weekly-leaderboard-list';
+        const listEl = document.getElementById(listId);
+
+        listEl.innerHTML = `
+          <div class="text-center py-3">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Loading...
+          </div>
+        `;
+
+        try {
+          const response = type === 'global'
+            ? await api.getGlobalLeaderboard(20)
+            : await api.getWeeklyLeaderboard(20);
+
+          if (response.leaderboard && response.leaderboard.length > 0) {
+            listEl.innerHTML = response.leaderboard
+              .map(
+                (entry, index) => `
+                  <div class="d-flex align-items-center justify-content-between mb-3 p-3 ${
+                    index < 3 ? 'bg-warning bg-opacity-10' : 'bg-light'
+                  } rounded">
+                    <div class="d-flex align-items-center">
+                      <div class="me-3 fw-bold ${index < 3 ? 'text-warning' : 'text-muted'}" style="min-width: 30px;">
+                        ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                      </div>
+                      <div>
+                        <div class="fw-bold">${entry.username}</div>
+                        <small class="text-muted">${entry.firstName} ${entry.lastName}</small>
+                      </div>
+                    </div>
+                    <div class="text-end">
+                      <div class="fw-bold text-primary">${entry.points} pts</div>
+                      <small class="text-muted">${entry.challengesCompleted} challenges</small>
+                    </div>
+                  </div>
+                `
+              )
+              .join('');
+          } else {
+            listEl.innerHTML = '<p class="text-muted text-center">No leaderboard data available yet.</p>';
+          }
+        } catch (error) {
+          console.error('Failed to load leaderboard:', error);
+          listEl.innerHTML = '<p class="text-danger text-center">Failed to load leaderboard data.</p>';
+        }
+      }
+
+      /**
+       * Show achievements
+       */
+      async function showAchievements() {
+        if (!api || !api.isAuthenticated()) {
+          authUI.showLoginModal();
+          return;
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('achievementsModal'));
+        modal.show();
+
+        const achievementsList = document.getElementById('achievements-list');
+        achievementsList.innerHTML = `
+          <div class="text-center py-3">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Loading achievements...
+          </div>
+        `;
+
+        try {
+          const [allAchievements, userAchievements] = await Promise.all([
+            api.getAchievements(),
+            api.getUserAchievements(),
+          ]);
+
+          const unlockedIds = new Set(userAchievements.achievements?.map((a) => a.achievementId) || []);
+
+          if (allAchievements.achievements && allAchievements.achievements.length > 0) {
+            achievementsList.innerHTML = allAchievements.achievements
+              .map((achievement) => {
+                const isUnlocked = unlockedIds.has(achievement.id);
+                const userAch = userAchievements.achievements?.find((a) => a.achievementId === achievement.id);
+
+                return `
+                  <div class="card mb-3 ${isUnlocked ? 'border-success' : 'border-secondary opacity-75'}">
+                    <div class="card-body">
+                      <div class="d-flex align-items-center">
+                        <div class="fs-1 me-3">${achievement.icon}</div>
+                        <div class="flex-grow-1">
+                          <h6 class="mb-1">
+                            ${achievement.name}
+                            ${isUnlocked ? '<i class="fas fa-check-circle text-success ms-2"></i>' : '<i class="fas fa-lock text-muted ms-2"></i>'}
+                          </h6>
+                          <p class="text-muted mb-1 small">${achievement.description}</p>
+                          <div class="d-flex align-items-center">
+                            <span class="badge bg-primary me-2">${achievement.points} points</span>
+                            ${
+                              isUnlocked && userAch
+                                ? `<small class="text-muted">Unlocked: ${new Date(userAch.unlockedAt).toLocaleDateString()}</small>`
+                                : '<small class="text-muted">Locked</small>'
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              })
+              .join('');
+          } else {
+            achievementsList.innerHTML = '<p class="text-muted text-center">No achievements available yet.</p>';
+          }
+        } catch (error) {
+          console.error('Failed to load achievements:', error);
+          achievementsList.innerHTML = '<p class="text-danger text-center">Failed to load achievements.</p>';
+        }
+      }
+
+      // Make functions available globally
+      window.loadChallengesFromBackend = loadChallengesFromBackend;
+      window.showDashboard = showDashboard;
+      window.showLeaderboard = showLeaderboard;
+      window.loadLeaderboard = loadLeaderboard;
+      window.showAchievements = showAchievements;
     </script>
   </body>
 </html>
